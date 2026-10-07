@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trend TV</title>
+  <link rel="stylesheet" href="./src/styles.css" />
+</head>
+<body data-theme="green">
+  <div id="tv" class="tv">
+    <!-- top bar: drag region + gear -->
+    <div id="topbar" class="topbar" data-tauri-drag-region>
+      <span id="ch-badge" class="ch-badge">CH-00 · ALL</span>
+      <button id="gear" class="gear" title="TV Guide" aria-label="TV Guide">⚙</button>
+    </div>
+
+    <!-- main screen -->
+    <div id="screen" class="screen">
+      <div id="typed" class="typed">
+        <div class="line"><span class="label">REPO&nbsp;&nbsp;&nbsp;&nbsp;:</span> <span id="f-name"></span></div>
+        <div class="line"><span class="label">CHANNEL&nbsp;:</span> <span id="f-cat"></span></div>
+        <div class="line desc"><span class="label">ABOUT&nbsp;&nbsp;&nbsp;:</span> <span id="f-desc"></span></div>
+        <div class="line meta"><span id="f-meta"></span></div>
+        <span id="cursor" class="cursor">▌</span>
+      </div>
+
+      <!-- standby / signal lost card -->
+      <div id="standby" class="standby hidden">
+        <div class="bars"></div>
+        <div class="standby-text">PLEASE STAND BY</div>
+        <div class="standby-sub">signal lost · showing reruns</div>
+      </div>
+
+      <!-- static burst overlay for channel switching -->
+      <div id="static" class="static hidden"></div>
+
+      <!-- CRT effects -->
+      <div class="scanlines"></div>
+      <div class="vignette"></div>
+    </div>
+
+    <div class="hint">click card to open on GitHub · hover ⚙ for channels</div>
+
+    <!-- TV guide overlay -->
+    <div id="guide" class="guide hidden">
+      <div class="guide-title">── TV GUIDE ──────────</div>
+      <div id="guide-channels" class="guide-section"></div>
+      <div class="guide-sub">APPEARANCE</div>
+      <div id="guide-themes" class="guide-themes"></div>
+      <div class="guide-close" id="guide-close">[ close ]</div>
+    </div>
+  </div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

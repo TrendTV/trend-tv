@@ -1,0 +1,239 @@
+/* ─── Trend Companion · CRT TV ─────────────────────────────── */
+
+:root {
+  --bg: #050805;
+  --bezel: #111311;
+}
+
+body[data-theme="green"] {
+  --phosphor: #33ff66;
+  --phosphor-dim: #1a8038;
+  --glow: rgba(51, 255, 102, 0.35);
+  --screen-bg: radial-gradient(ellipse at center, #0a140c 0%, #040805 75%);
+}
+body[data-theme="amber"] {
+  --phosphor: #ffb000;
+  --phosphor-dim: #8a5e00;
+  --glow: rgba(255, 176, 0, 0.3);
+  --screen-bg: radial-gradient(ellipse at center, #171106 0%, #080503 75%);
+}
+body[data-theme="vhs"] {
+  --phosphor: #5ac8ff;
+  --phosphor-dim: #1e5f82;
+  --glow: rgba(90, 200, 255, 0.3);
+  --screen-bg: radial-gradient(ellipse at center, #0a1220 0%, #04070d 75%);
+}
+body[data-theme="bw"] {
+  --phosphor: #e8e8e8;
+  --phosphor-dim: #777;
+  --glow: rgba(232, 232, 232, 0.25);
+  --screen-bg: radial-gradient(ellipse at center, #161616 0%, #060606 75%);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  font-family: "Courier New", "Consolas", monospace;
+  user-select: none;
+}
+
+.tv {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 6px solid var(--bezel);
+  border-radius: 14px;
+  background: var(--bezel);
+}
+
+/* ── top bar ── */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: var(--phosphor-dim);
+  -webkit-app-region: drag;
+}
+.ch-badge { letter-spacing: 1px; }
+.gear {
+  background: none;
+  border: none;
+  color: var(--phosphor-dim);
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0.25;
+  transition: opacity 0.15s, transform 0.3s;
+  -webkit-app-region: no-drag;
+}
+.gear:hover { opacity: 1; color: var(--phosphor); transform: rotate(60deg); }
+
+/* ── screen ── */
+.screen {
+  position: relative;
+  flex: 1;
+  margin: 0 8px;
+  border-radius: 10px;
+  background: var(--screen-bg);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.typed {
+  position: absolute;
+  inset: 0;
+  padding: 18px 18px 12px;
+  color: var(--phosphor);
+  text-shadow: 0 0 6px var(--glow), 1px 0 0 rgba(255,0,80,0.15), -1px 0 0 rgba(0,180,255,0.15);
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+  z-index: 2;
+}
+.label { color: var(--phosphor-dim); }
+.line.meta { margin-top: 8px; font-size: 12px; color: var(--phosphor-dim); }
+.line.desc { display: block; }
+.cursor {
+  display: inline-block;
+  animation: blink 0.9s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* glitch-out between cards */
+.screen.glitch .typed {
+  animation: glitchout 0.35s steps(6) forwards;
+}
+@keyframes glitchout {
+  0%   { opacity: 1; transform: translateX(0); }
+  30%  { opacity: 0.8; transform: translateX(-6px) skewX(8deg); }
+  60%  { opacity: 0.4; transform: translateX(5px) skewX(-6deg); }
+  100% { opacity: 0; transform: translateX(0) skewX(0); }
+}
+.screen.glitch-in .typed {
+  animation: glitchin 0.3s steps(4) forwards;
+}
+@keyframes glitchin {
+  0% { opacity: 0; } 40% { opacity: 0.5; transform: translateX(3px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* ── static burst (channel switch) ── */
+.static {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background-image: repeating-conic-gradient(#fff 0% 0.0001%, #000 0.0002% 0.0003%);
+  background-size: 220% 220%;
+  opacity: 0.9;
+  animation: staticnoise 0.08s steps(2) infinite;
+}
+@keyframes staticnoise {
+  0% { background-position: 0 0; }
+  50% { background-position: 40% 60%; }
+  100% { background-position: 80% 20%; }
+}
+
+/* ── standby test card ── */
+.standby {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #0a0a0a;
+}
+.standby .bars {
+  width: 70%;
+  height: 34%;
+  border-radius: 6px;
+  background: linear-gradient(to right,
+    #c0c0c0 0 14.3%, #c0c000 14.3% 28.6%, #00c0c0 28.6% 42.9%,
+    #00c000 42.9% 57.2%, #c000c0 57.2% 71.5%, #c00000 71.5% 85.8%, #0000c0 85.8% 100%);
+  animation: barflicker 3s steps(2) infinite;
+}
+@keyframes barflicker { 0%,98% { opacity: 1; } 99% { opacity: 0.85; } }
+.standby-text {
+  color: #e8e8e8;
+  font-size: 18px;
+  letter-spacing: 4px;
+  text-shadow: 0 0 8px rgba(255,255,255,0.4);
+}
+.standby-sub { color: #888; font-size: 11px; letter-spacing: 2px; }
+
+/* ── CRT overlays ── */
+.scanlines {
+  position: absolute; inset: 0; z-index: 6; pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom, transparent 0px, transparent 2px, rgba(0,0,0,0.22) 3px, rgba(0,0,0,0.22) 4px);
+  mix-blend-mode: multiply;
+}
+.vignette {
+  position: absolute; inset: 0; z-index: 7; pointer-events: none;
+  border-radius: 10px;
+  box-shadow: inset 0 0 60px 24px rgba(0,0,0,0.65);
+  animation: flicker 4s infinite;
+}
+@keyframes flicker {
+  0%, 100% { opacity: 1; } 97% { opacity: 1; } 98% { opacity: 0.92; } 99% { opacity: 0.97; }
+}
+
+.hint {
+  text-align: center;
+  font-size: 10px;
+  color: var(--phosphor-dim);
+  opacity: 0.5;
+  padding: 3px 0 4px;
+}
+
+/* ── TV guide overlay ── */
+.guide {
+  position: absolute;
+  inset: 8px;
+  z-index: 20;
+  background: rgba(4, 8, 5, 0.94);
+  border: 1px solid var(--phosphor-dim);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: var(--phosphor);
+  font-size: 13px;
+  text-shadow: 0 0 5px var(--glow);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.guide-title { color: var(--phosphor-dim); margin-bottom: 4px; letter-spacing: 1px; }
+.guide-section { display: flex; flex-direction: column; gap: 2px; }
+.ch-item {
+  padding: 2px 6px;
+  cursor: pointer;
+  border-radius: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ch-item:hover, .ch-item.active { background: var(--phosphor); color: #04140a; text-shadow: none; }
+.guide-sub { color: var(--phosphor-dim); margin-top: 8px; letter-spacing: 2px; font-size: 11px; }
+.guide-themes { display: flex; gap: 8px; flex-wrap: wrap; }
+.theme-chip {
+  padding: 3px 10px;
+  border: 1px solid var(--phosphor-dim);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.theme-chip:hover, .theme-chip.active { background: var(--phosphor); color: #04140a; }
+.guide-close { margin-top: auto; text-align: center; color: var(--phosphor-dim); cursor: pointer; }
+.guide-close:hover { color: var(--phosphor); }
+
+.hidden { display: none !important; }
