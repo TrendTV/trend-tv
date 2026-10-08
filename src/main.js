@@ -54,7 +54,7 @@ function categorize(lang, desc) {
 const state = {
   channel: localStorage.getItem('tc.channel') || 'all',
   theme: localStorage.getItem('tc.theme') || 'green',
-  cabinet: localStorage.getItem('tc.cabinet') || 'slim',
+  cabinet: localStorage.getItem('tc.cabinet') || 'woody70',
   chKnobAngle: 0,
   items: [],          // all items for current channel
   bag: [],            // shuffled queue (no repeats until exhausted)
