@@ -6,47 +6,69 @@
   <title>Trend TV</title>
   <link rel="stylesheet" href="./src/styles.css" />
 </head>
-<body data-theme="green">
+<body data-theme="green" data-cabinet="slim">
   <div id="tv" class="tv">
-    <!-- top bar: drag region + gear -->
-    <div id="topbar" class="topbar" data-tauri-drag-region>
-      <span id="ch-badge" class="ch-badge">CH-00 · ALL</span>
-      <button id="gear" class="gear" title="TV Guide" aria-label="TV Guide">⚙</button>
-    </div>
-
-    <!-- main screen -->
-    <div id="screen" class="screen">
-      <div id="typed" class="typed">
-        <div class="line"><span class="label">REPO&nbsp;&nbsp;&nbsp;&nbsp;:</span> <span id="f-name"></span></div>
-        <div class="line"><span class="label">CHANNEL&nbsp;:</span> <span id="f-cat"></span></div>
-        <div class="line desc"><span class="label">ABOUT&nbsp;&nbsp;&nbsp;:</span> <span id="f-desc"></span></div>
-        <div class="line meta"><span id="f-meta"></span></div>
-        <span id="cursor" class="cursor">▌</span>
+    <div class="cab-main">
+      <!-- top bar: drag region + gear -->
+      <div id="topbar" class="topbar" data-tauri-drag-region>
+        <span id="ch-badge" class="ch-badge">CH-00 · ALL</span>
+        <button id="gear" class="gear" title="TV Guide" aria-label="TV Guide">⚙</button>
       </div>
 
-      <!-- standby / signal lost card -->
-      <div id="standby" class="standby hidden">
-        <div class="bars"></div>
-        <div class="standby-text">PLEASE STAND BY</div>
-        <div class="standby-sub">signal lost · showing reruns</div>
+      <!-- main screen -->
+      <div id="screen" class="screen">
+        <div id="typed" class="typed">
+          <div class="line"><span class="label">REPO&nbsp;&nbsp;&nbsp;&nbsp;:</span> <span id="f-name"></span></div>
+          <div class="line"><span class="label">CHANNEL&nbsp;:</span> <span id="f-cat"></span></div>
+          <div class="line desc"><span class="label">ABOUT&nbsp;&nbsp;&nbsp;:</span> <span id="f-desc"></span></div>
+          <div class="line meta"><span id="f-meta"></span></div>
+          <span id="cursor" class="cursor">▌</span>
+        </div>
+
+        <!-- standby / signal lost card -->
+        <div id="standby" class="standby hidden">
+          <div class="bars"></div>
+          <div class="standby-text">PLEASE STAND BY</div>
+          <div class="standby-sub">signal lost · showing reruns</div>
+        </div>
+
+        <!-- static burst overlay for channel switching -->
+        <div id="static" class="static hidden"></div>
+
+        <!-- CRT effects -->
+        <div class="scanlines"></div>
+        <div class="vignette"></div>
       </div>
 
-      <!-- static burst overlay for channel switching -->
-      <div id="static" class="static hidden"></div>
-
-      <!-- CRT effects -->
-      <div class="scanlines"></div>
-      <div class="vignette"></div>
+      <div class="hint">click card to open on GitHub · hover ⚙ for channels</div>
     </div>
 
-    <div class="hint">click card to open on GitHub · hover ⚙ for channels</div>
+    <!-- 70s woody cabinet control panel (hidden in slim mode) -->
+    <div id="cab-panel" class="cab-panel">
+      <div class="brand">TREND&nbsp;TV</div>
+      <div class="knob-row">
+        <div class="knob-wrap">
+          <div id="knob-ch" class="knob" title="Channel"><div class="knob-ind"></div></div>
+          <span class="knob-label">CH</span>
+        </div>
+        <div class="knob-wrap">
+          <div id="knob-vol" class="knob small" title="Volume"><div class="knob-ind"></div></div>
+          <span class="knob-label">VOL</span>
+        </div>
+      </div>
+      <div class="speaker"></div>
+    </div>
 
     <!-- TV guide overlay -->
     <div id="guide" class="guide hidden">
       <div class="guide-title">── TV GUIDE ──────────</div>
       <div id="guide-channels" class="guide-section"></div>
-      <div class="guide-sub">APPEARANCE</div>
+      <div class="guide-sub">BODY</div>
+      <div id="guide-cabinets" class="guide-themes"></div>
+      <div class="guide-sub">SCREEN</div>
       <div id="guide-themes" class="guide-themes"></div>
+      <div class="guide-sub">VOLUME</div>
+      <div id="guide-volume" class="guide-themes"></div>
       <div class="guide-close" id="guide-close">[ close ]</div>
     </div>
   </div>

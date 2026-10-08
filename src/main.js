@@ -5,6 +5,7 @@
 import snapshot from './snapshot.json';
 import { invoke } from '@tauri-apps/api/core';
 import { openUrl } from '@tauri-apps/plugin-opener';
+import * as snd from './sounds.js';
 
 const CHANNELS = [
   { id: 'all',        num: 'CH-00', label: 'ALL',        desc: 'everything trending' },
@@ -20,6 +21,19 @@ const THEMES = [
   { id: 'amber', label: 'Amber' },
   { id: 'vhs',   label: 'VHS Blue' },
   { id: 'bw',    label: 'B&W 1950s' },
+];
+
+const CABINETS = [
+  { id: 'slim',    label: 'Slim bezel' },
+  { id: 'woody70', label: 'Woody 70s' },
+];
+
+// volume presets — default LOW, barely audible, never scare the user
+const VOLUMES = [
+  { id: 'off',  v: 0,    label: 'Off' },
+  { id: 'low',  v: 0.12, label: 'Low' },
+  { id: 'med',  v: 0.35, label: 'Med' },
+  { id: 'high', v: 0.7,  label: 'High' },
 ];
 
 /* keyword categorization — mirrors the Rust backend, used for
@@ -40,6 +54,8 @@ function categorize(lang, desc) {
 const state = {
   channel: localStorage.getItem('tc.channel') || 'all',
   theme: localStorage.getItem('tc.theme') || 'green',
+  cabinet: localStorage.getItem('tc.cabinet') || 'slim',
+  chKnobAngle: 0,
   items: [],          // all items for current channel
   bag: [],            // shuffled queue (no repeats until exhausted)
   seen: JSON.parse(localStorage.getItem('tc.seen') || '[]'),
@@ -119,6 +135,7 @@ function typeInto(el, text, speed, done) {
   const step = () => {
     if (i < text.length) {
       el.textContent += text[i++];
+      if (text[i - 1] !== ' ') snd.clack();
       // variable per-char delay → mechanical feel
       const jitter = speed * (0.4 + Math.random() * 1.2);
       later(step, jitter);
@@ -163,6 +180,7 @@ function switchChannel(id) {
   state.channel = id;
   localStorage.setItem('tc.channel', id);
   clearTimers();
+  snd.staticBurst(0.55, 0.5);
   const st = $('static');
   st.classList.remove('hidden');
   later(() => {
@@ -206,9 +224,70 @@ function renderGuide() {
     const div = document.createElement('div');
     div.className = 'theme-chip' + (t.id === state.theme ? ' active' : '');
     div.textContent = t.label;
-    div.onclick = () => setTheme(t.id);
+    div.onclick = () => { snd.knobClick(); setTheme(t.id); };
     tw.appendChild(div);
   });
+  const cw = $('guide-cabinets');
+  cw.innerHTML = '';
+  CABINETS.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'theme-chip' + (c.id === state.cabinet ? ' active' : '');
+    div.textContent = c.label;
+    div.onclick = () => { snd.knobClick(); setCabinet(c.id); };
+    cw.appendChild(div);
+  });
+  const vw = $('guide-volume');
+  vw.innerHTML = '';
+  const curVol = snd.getVolume();
+  VOLUMES.forEach(v => {
+    const div = document.createElement('div');
+    const active = Math.abs(curVol - v.v) < 0.01 ||
+      (v.id === 'off' && curVol === 0);
+    div.className = 'theme-chip' + (active ? ' active' : '');
+    div.textContent = v.label;
+    div.onclick = () => { setVolumeStep(v.v); };
+    vw.appendChild(div);
+  });
+}
+
+function setCabinet(id) {
+  state.cabinet = id;
+  document.body.dataset.cabinet = id;
+  localStorage.setItem('tc.cabinet', id);
+  renderGuide();
+}
+
+function setVolumeStep(v) {
+  snd.setVolume(v);
+  snd.knobClick();
+  syncVolKnob();
+  renderGuide();
+}
+
+/* ── physical knobs (woody70 cabinet) ── */
+function syncVolKnob() {
+  const knob = $('knob-vol');
+  if (!knob) return;
+  // map 0..0.7 → -135°..+135°
+  const angle = -135 + (snd.getVolume() / 0.7) * 270;
+  knob.style.transform = `rotate(${angle}deg)`;
+}
+
+function turnChKnob() {
+  snd.knobClick();
+  state.chKnobAngle += 60; // detent click per channel
+  $('knob-ch').style.transform = `rotate(${state.chKnobAngle}deg)`;
+  const idx = CHANNELS.findIndex(c => c.id === state.channel);
+  const next = CHANNELS[(idx + 1) % CHANNELS.length];
+  switchChannel(next.id);
+}
+
+function turnVolKnob() {
+  const cur = snd.getVolume();
+  // cycle off → low → med → high → off
+  const idx = VOLUMES.findIndex(v => Math.abs(cur - v.v) < 0.01);
+  const next = VOLUMES[(idx + 1) % VOLUMES.length];
+  setVolumeStep(next.v);
 }
 
 function toggleGuide(force) {
@@ -240,10 +319,21 @@ async function openCurrent() {
 
 /* ── boot ── */
 async function boot() {
+  // URL overrides for testing/sharing: ?cabinet=woody70&theme=amber
+  const q = new URLSearchParams(location.search);
+  if (q.get('cabinet')) state.cabinet = q.get('cabinet');
+  if (q.get('theme')) state.theme = q.get('theme');
   document.body.dataset.theme = state.theme;
-  $('gear').onclick = () => toggleGuide();
+  document.body.dataset.cabinet = state.cabinet;
+  $('gear').onclick = () => { snd.knobClick(); toggleGuide(); };
   $('guide-close').onclick = () => toggleGuide(false);
   $('screen').onclick = (e) => { if (!e.target.closest('.guide')) openCurrent(); };
+  $('screen').addEventListener('mouseenter', () => snd.degauss());
+  $('knob-ch').onclick = (e) => { e.stopPropagation(); turnChKnob(); };
+  $('knob-vol').onclick = (e) => { e.stopPropagation(); turnVolKnob(); };
+  syncVolKnob();
+  // browsers gate audio behind the first gesture; play power-on then
+  snd.armAudioUnlock(() => snd.powerOn());
 
   state.allItems = await loadFeed();
   if (state.signalLost) $('standby').classList.remove('hidden');

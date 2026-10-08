@@ -16,7 +16,15 @@ while you vibe code.
   channels: ALL / Production / Visual / Audio / DevTools / Games, with a
   static-burst channel-change animation. Categories are keyword-classified
   from each repo's language and description.
-- **TV appearances** — Green CRT, Amber, VHS Blue, B&W 1950s themes.
+- **TV appearances** — two body styles (Slim bezel, Woody 70s cabinet with
+  working CH/VOL knobs and speaker grille) × four phosphor themes
+  (Green CRT, Amber, VHS Blue, B&W 1950s).
+- **CRT sound pack** — fully synthesized with WebAudio (no audio files):
+  power-on hum + tube crackle, per-character typing clacks, static bursts
+  on channel switches, degauss wobble on hover, mechanical knob clicks.
+  **Volume defaults to Low (barely audible)** and can be set Off/Low/Med/High
+  in the TV Guide or by clicking the VOL knob. A constant whisper-level
+  50 Hz tube hum runs underneath once audio is unlocked.
 - **Click a card** to open the repo on GitHub.
 - **Resilient feed** — the Rust backend scrapes `github.com/trending`
   (daily + weekly, merged & deduped) every 3 h into a local JSON cache.

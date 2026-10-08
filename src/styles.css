@@ -237,3 +237,115 @@ html, body {
 .guide-close:hover { color: var(--phosphor); }
 
 .hidden { display: none !important; }
+
+/* ─── 70s woody cabinet ─────────────────────────────────────── */
+
+.cab-panel { display: none; }
+
+body[data-cabinet="woody70"] .tv {
+  flex-direction: row;
+  border: none;
+  border-radius: 18px;
+  background:
+    /* wood grain */
+    repeating-linear-gradient(93deg,
+      #4a2f1b 0px, #543620 3px, #3f2815 6px, #5b3a22 9px,
+      #462c18 13px, #503218 17px, #3a2412 21px, #553721 26px),
+    linear-gradient(180deg, #543620, #3a2412);
+  box-shadow:
+    inset 0 2px 3px rgba(255, 220, 160, 0.25),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.6),
+    0 6px 18px rgba(0, 0, 0, 0.55);
+  padding: 10px 8px 10px 10px;
+}
+
+body[data-cabinet="woody70"] .cab-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: #1a120a;
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), 0 1px 0 rgba(255,220,160,0.15);
+}
+
+body[data-cabinet="woody70"] .topbar { color: #b08d5f; }
+body[data-cabinet="woody70"] .gear { color: #b08d5f; }
+body[data-cabinet="woody70"] .gear:hover { color: #e8c890; }
+body[data-cabinet="woody70"] .hint { display: none; }
+
+body[data-cabinet="woody70"] .cab-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 84px;
+  margin-left: 8px;
+  padding: 10px 4px;
+  border-radius: 8px;
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(0,0,0,0.12) 0 2px, transparent 2px 5px),
+    linear-gradient(180deg, #40291a, #2e1c10);
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.55), 0 1px 0 rgba(255,220,160,0.12);
+}
+
+.brand {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #d8b184;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.8);
+  border: 1px solid rgba(216,177,132,0.35);
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.knob-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+.knob-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.knob-label { font-size: 8px; letter-spacing: 1px; color: #b08d5f; }
+
+.knob {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  background:
+    radial-gradient(circle at 35% 30%, #8a6a45, #5a4128 55%, #2e1f10 100%);
+  box-shadow:
+    0 3px 6px rgba(0,0,0,0.6),
+    inset 0 1px 2px rgba(255,230,180,0.35),
+    inset 0 -2px 4px rgba(0,0,0,0.5);
+  transition: transform 0.18s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+.knob.small { width: 30px; height: 30px; }
+.knob:hover { filter: brightness(1.15); }
+.knob-ind {
+  position: absolute;
+  left: 50%; top: 2px;
+  width: 3px; height: 10px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: #e8c890;
+  box-shadow: 0 0 2px rgba(0,0,0,0.6);
+}
+
+.speaker {
+  width: 64px;
+  flex: 1;
+  min-height: 60px;
+  margin-top: 4px;
+  border-radius: 6px;
+  background: repeating-linear-gradient(
+    0deg, #1c110a 0 3px, #0d0805 3px 5px);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.8), 0 1px 0 rgba(255,220,160,0.1);
+}
+
+/* slim cabinet keeps the original look */
+.cab-main { display: contents; }
