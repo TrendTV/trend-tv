@@ -423,8 +423,11 @@ async function boot() {
   if (state.signalLost) $('standby').classList.remove('hidden');
   updateChBadge();
   refillBag();
-  const item = nextItem();
+  // ?item=N pins a specific repo (used for recording/demo frames)
+  const pinned = q.get('item') !== null ? state.allItems[parseInt(q.get('item'), 10)] : null;
+  const item = pinned || nextItem();
   if (item) showItem(item);
+  if (pinned) clearTimers(); // freeze on the pinned card
   if (q.get('guide')) toggleGuide(true);
 
   // the backend crawls GitHub on every app open; pick up the fresh

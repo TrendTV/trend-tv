@@ -4,7 +4,7 @@ A tiny CRT-TV desktop companion that lives in the corner of your screen and
 types out trending GitHub repos — like watching a retro terminal channel
 while you vibe code.
 
-![preview](shot1.png)
+![Trend TV typing demo](trend-tv-demo.gif)
 
 ## Features (v0.1)
 
