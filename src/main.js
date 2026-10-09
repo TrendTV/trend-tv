@@ -96,7 +96,7 @@ const state = {
   cabinet: localStorage.getItem('tc.cabinet') || 'woody70',
   holdMs: Math.min(20000, Math.max(2000,
     parseInt(localStorage.getItem('tc.hold') || '5000', 10) || 5000)),
-  font: localStorage.getItem('tc.font') || 'auto',
+  font: localStorage.getItem('tc.font') || 'console',
   chKnobAngle: 0,
   items: [],          // all items for current channel
   bag: [],            // shuffled queue (no repeats until exhausted)
