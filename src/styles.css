@@ -38,8 +38,6 @@ body[data-theme="sakura"] {
   --screen-bg: radial-gradient(ellipse at center, #2b1020 0%, #12060d 75%);
   --font: "Comic Sans MS", "Chalkboard SE", "Segoe Print", cursive;
 }
-body[data-theme="sakura"] .cursor { font-size: 0; }
-body[data-theme="sakura"] .cursor::after { content: "♥"; font-size: 15px; }
 body[data-theme="sakura"] .screen { border-radius: 18px; }
 body[data-theme="sakura"] .typed { text-shadow: 0 0 8px var(--glow), 2px 2px 0 rgba(120, 20, 60, 0.6); }
 
@@ -73,17 +71,37 @@ body[data-theme="gameboy"] .scanlines {
     to bottom, transparent 0px, transparent 3px, rgba(8, 31, 8, 0.45) 4px, rgba(8, 31, 8, 0.45) 5px);
 }
 
-/* ── paper telegram: cream e-ink, serif typewriter, no scanlines ── */
-body[data-theme="paper"] {
-  --phosphor: #33302a;
-  --phosphor-dim: #7a6f5d;
-  --glow: rgba(80, 70, 50, 0.25);
-  --screen-bg: radial-gradient(ellipse at center, #f2e8d5 0%, #ddd0b8 75%);
-  --font: Georgia, "Times New Roman", serif;
+/* ── channel button grid in the TV guide ── */
+.ch-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  overflow-y: auto;
+  max-height: 45%;
+  min-height: 78px; /* a scrollable flex item may shrink to 0 — keep ≥3 rows */
+  padding-right: 2px;
 }
-body[data-theme="paper"] .typed { text-shadow: none; }
-body[data-theme="paper"] .scanlines { display: none; }
-body[data-theme="paper"] .vignette { box-shadow: inset 0 0 42px 15px rgba(120, 100, 70, 0.35); animation: none; }
+.ch-btn {
+  flex: 1 1 44%;
+  padding: 4px 6px;
+  border: 1px solid var(--phosphor-dim);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--phosphor);
+}
+.ch-btn:hover, .ch-btn.active { background: var(--phosphor); color: #04140a; text-shadow: none; }
+.ch-detail {
+  min-height: 18px;
+  font-size: 11px;
+  color: var(--phosphor-dim);
+  padding: 2px 4px;
+}
 body[data-theme="paper"] .theme-chip:hover, body[data-theme="paper"] .ch-item:hover,
 body[data-theme="paper"] .theme-chip.active, body[data-theme="paper"] .ch-item.active { color: #f2e8d5; }
 
@@ -304,44 +322,30 @@ html, body {
 
 .hidden { display: none !important; }
 
-/* ─── 70s woody cabinet ─────────────────────────────────────── */
+/* ─── cabinets (TV bodies) ──────────────────────────────────────
+   slim = borderless modern look; every other cabinet gets the
+   side control panel + shared knob/speaker/brand parts, then
+   per-cabinet skin overrides. */
 
 .cab-panel { display: none; }
 
-body[data-cabinet="woody70"] .tv {
+/* shared layout for all non-slim cabinets */
+body[data-cabinet]:not([data-cabinet="slim"]) .tv {
   flex-direction: row;
   border: none;
   border-radius: 18px;
-  background:
-    /* wood grain */
-    repeating-linear-gradient(93deg,
-      #4a2f1b 0px, #543620 3px, #3f2815 6px, #5b3a22 9px,
-      #462c18 13px, #503218 17px, #3a2412 21px, #553721 26px),
-    linear-gradient(180deg, #543620, #3a2412);
-  box-shadow:
-    inset 0 2px 3px rgba(255, 220, 160, 0.25),
-    inset 0 -3px 6px rgba(0, 0, 0, 0.6),
-    0 6px 18px rgba(0, 0, 0, 0.55);
   padding: 10px 8px 10px 10px;
 }
-
-body[data-cabinet="woody70"] .cab-main {
+body[data-cabinet]:not([data-cabinet="slim"]) .cab-main {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: #1a120a;
   border-radius: 10px;
   padding: 4px;
-  box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), 0 1px 0 rgba(255,220,160,0.15);
 }
-
-body[data-cabinet="woody70"] .topbar { color: #b08d5f; }
-body[data-cabinet="woody70"] .gear { color: #b08d5f; }
-body[data-cabinet="woody70"] .gear:hover { color: #e8c890; }
-body[data-cabinet="woody70"] .hint { display: none; }
-
-body[data-cabinet="woody70"] .cab-panel {
+body[data-cabinet]:not([data-cabinet="slim"]) .hint { display: none; }
+body[data-cabinet]:not([data-cabinet="slim"]) .cab-panel {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -350,13 +354,9 @@ body[data-cabinet="woody70"] .cab-panel {
   margin-left: 8px;
   padding: 10px 4px;
   border-radius: 8px;
-  background:
-    repeating-linear-gradient(90deg,
-      rgba(0,0,0,0.12) 0 2px, transparent 2px 5px),
-    linear-gradient(180deg, #40291a, #2e1c10);
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.55), 0 1px 0 rgba(255,220,160,0.12);
 }
 
+/* shared parts (woody colors are the base skin) */
 .brand {
   font-size: 9px;
   letter-spacing: 2px;
@@ -366,26 +366,17 @@ body[data-cabinet="woody70"] .cab-panel {
   padding: 2px 5px;
   border-radius: 3px;
 }
-
-.knob-row {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
-}
+.knob-row { display: flex; flex-direction: column; gap: 10px; align-items: center; }
 .knob-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .knob-label { font-size: 8px; letter-spacing: 1px; color: #b08d5f; }
-
 .knob {
   position: relative;
   width: 38px;
   height: 38px;
   border-radius: 50%;
   cursor: pointer;
-  background:
-    radial-gradient(circle at 35% 30%, #8a6a45, #5a4128 55%, #2e1f10 100%);
-  box-shadow:
-    0 3px 6px rgba(0,0,0,0.6),
+  background: radial-gradient(circle at 35% 30%, #8a6a45, #5a4128 55%, #2e1f10 100%);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.6),
     inset 0 1px 2px rgba(255,230,180,0.35),
     inset 0 -2px 4px rgba(0,0,0,0.5);
   transition: transform 0.18s cubic-bezier(0.3, 1.4, 0.5, 1);
@@ -401,16 +392,199 @@ body[data-cabinet="woody70"] .cab-panel {
   background: #e8c890;
   box-shadow: 0 0 2px rgba(0,0,0,0.6);
 }
-
 .speaker {
   width: 64px;
   flex: 1;
   min-height: 60px;
   margin-top: 4px;
   border-radius: 6px;
-  background: repeating-linear-gradient(
-    0deg, #1c110a 0 3px, #0d0805 3px 5px);
+  background: repeating-linear-gradient(0deg, #1c110a 0 3px, #0d0805 3px 5px);
   box-shadow: inset 0 2px 6px rgba(0,0,0,0.8), 0 1px 0 rgba(255,220,160,0.1);
+}
+
+/* ── woody 70s ── */
+body[data-cabinet="woody70"] .tv {
+  background:
+    repeating-linear-gradient(93deg,
+      #4a2f1b 0px, #543620 3px, #3f2815 6px, #5b3a22 9px,
+      #462c18 13px, #503218 17px, #3a2412 21px, #553721 26px),
+    linear-gradient(180deg, #543620, #3a2412);
+  box-shadow: inset 0 2px 3px rgba(255,220,160,0.25),
+    inset 0 -3px 6px rgba(0,0,0,0.6), 0 6px 18px rgba(0,0,0,0.55);
+}
+body[data-cabinet="woody70"] .cab-main {
+  background: #1a120a;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), 0 1px 0 rgba(255,220,160,0.15);
+}
+body[data-cabinet="woody70"] .topbar,
+body[data-cabinet="woody70"] .gear { color: #b08d5f; }
+body[data-cabinet="woody70"] .gear:hover { color: #e8c890; }
+body[data-cabinet="woody70"] .cab-panel {
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.12) 0 2px, transparent 2px 5px),
+    linear-gradient(180deg, #40291a, #2e1c10);
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.55), 0 1px 0 rgba(255,220,160,0.12);
+}
+
+/* ── cartoon: chunky pastel plastic, bubble buttons ── */
+body[data-cabinet="cartoon"] .tv {
+  border-radius: 26px;
+  background: linear-gradient(180deg, #ffd6e8, #ffb3d4 60%, #ff9ec7);
+  box-shadow: inset 0 3px 0 rgba(255,255,255,0.7),
+    inset 0 -4px 0 rgba(214,81,138,0.55), 0 8px 0 rgba(0,0,0,0.25);
+}
+body[data-cabinet="cartoon"] .cab-main {
+  background: #fff0f7;
+  border: 3px solid #ff7fb2;
+  border-radius: 16px;
+  box-shadow: inset 0 2px 6px rgba(214,81,138,0.35);
+}
+body[data-cabinet="cartoon"] .topbar,
+body[data-cabinet="cartoon"] .gear { color: #c2447f; }
+body[data-cabinet="cartoon"] .gear { border-color: #c2447f; background: #ffd6e8; }
+body[data-cabinet="cartoon"] .gear:hover { background: #ff7fb2; color: #fff; }
+body[data-cabinet="cartoon"] .cab-panel {
+  background: linear-gradient(180deg, #ffe3f0, #ffc7e0);
+  border: 3px solid #ff7fb2;
+  border-radius: 16px;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.7);
+}
+body[data-cabinet="cartoon"] .brand {
+  color: #fff; background: #ff7fb2; border: none; border-radius: 8px;
+  font-weight: bold; text-shadow: none;
+}
+body[data-cabinet="cartoon"] .knob {
+  background: radial-gradient(circle at 35% 30%, #fff 0%, #ffd6e8 40%, #ff9ec7 100%);
+  border: 3px solid #ff7fb2;
+  box-shadow: 0 4px 0 rgba(214,81,138,0.6), inset 0 2px 0 rgba(255,255,255,0.8);
+}
+body[data-cabinet="cartoon"] .knob:active { transform: translateY(2px) !important; box-shadow: 0 2px 0 rgba(214,81,138,0.6); }
+body[data-cabinet="cartoon"] .knob-ind { background: #ff7fb2; }
+body[data-cabinet="cartoon"] .knob-label { color: #c2447f; font-weight: bold; }
+body[data-cabinet="cartoon"] .speaker {
+  background: repeating-linear-gradient(0deg, #ff9ec7 0 4px, #ffd6e8 4px 7px);
+  border: 3px solid #ff7fb2;
+  border-radius: 12px;
+  box-shadow: inset 0 2px 4px rgba(214,81,138,0.4);
+}
+
+/* ── cyberdeck: dark gunmetal, neon trim ── */
+body[data-cabinet="cyberdeck"] .tv {
+  border-radius: 6px;
+  background: linear-gradient(180deg, #1c2130, #0d1017);
+  box-shadow: inset 0 1px 0 rgba(0,255,240,0.35),
+    inset 0 -2px 0 rgba(157,78,221,0.4), 0 0 22px rgba(0,255,240,0.18);
+}
+body[data-cabinet="cyberdeck"] .cab-main {
+  background: #05070c;
+  border: 1px solid rgba(0,255,240,0.5);
+  border-radius: 4px;
+  box-shadow: inset 0 0 14px rgba(0,255,240,0.15);
+}
+body[data-cabinet="cyberdeck"] .topbar,
+body[data-cabinet="cyberdeck"] .gear { color: #00fff0; }
+body[data-cabinet="cyberdeck"] .gear { border-color: rgba(0,255,240,0.6); background: rgba(0,255,240,0.08); }
+body[data-cabinet="cyberdeck"] .gear:hover { background: #00fff0; color: #05070c; }
+body[data-cabinet="cyberdeck"] .cab-panel {
+  background: linear-gradient(180deg, #161a26, #0a0d14);
+  border: 1px solid rgba(157,78,221,0.55);
+  border-radius: 4px;
+  box-shadow: inset 0 0 10px rgba(157,78,221,0.25);
+}
+body[data-cabinet="cyberdeck"] .brand {
+  color: #00fff0; border-color: rgba(0,255,240,0.6);
+  text-shadow: 0 0 6px rgba(0,255,240,0.6); border-radius: 2px;
+}
+body[data-cabinet="cyberdeck"] .knob {
+  background: radial-gradient(circle at 35% 30%, #3a4258, #1a1f2e 60%, #0a0d14);
+  border: 1px solid rgba(0,255,240,0.55);
+  box-shadow: 0 0 10px rgba(0,255,240,0.25), inset 0 1px 2px rgba(255,255,255,0.15);
+}
+body[data-cabinet="cyberdeck"] .knob-ind { background: #00fff0; box-shadow: 0 0 5px rgba(0,255,240,0.8); }
+body[data-cabinet="cyberdeck"] .knob-label { color: #9d4edd; }
+body[data-cabinet="cyberdeck"] .speaker {
+  background: repeating-linear-gradient(90deg, #0a0d14 0 3px, #1a2233 3px 5px);
+  border: 1px solid rgba(0,255,240,0.3);
+  border-radius: 3px;
+}
+
+/* ── pixel: light-gray handheld plastic, purple buttons ── */
+body[data-cabinet="pixel"] .tv {
+  border-radius: 14px 14px 34px 14px;
+  background: linear-gradient(180deg, #d6d3c8, #bfbcb0 70%, #a8a59a);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.6),
+    inset 0 -3px 0 rgba(90,88,80,0.5), 0 6px 14px rgba(0,0,0,0.4);
+}
+body[data-cabinet="pixel"] .cab-main {
+  background: #3c3a44;
+  border: 3px solid #8b8896;
+  border-radius: 8px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.7);
+}
+body[data-cabinet="pixel"] .topbar,
+body[data-cabinet="pixel"] .gear { color: #cfcbe0; }
+body[data-cabinet="pixel"] .gear { border-color: #6f5a9e; background: #4a4660; }
+body[data-cabinet="pixel"] .gear:hover { background: #6f5a9e; color: #fff; }
+body[data-cabinet="pixel"] .cab-panel {
+  background: linear-gradient(180deg, #cfccc2, #b5b2a8);
+  border: 2px solid #8b8878;
+  border-radius: 10px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+}
+body[data-cabinet="pixel"] .brand {
+  color: #4a4660; border: none; background: transparent;
+  font-weight: bold; font-style: italic; text-shadow: none;
+}
+body[data-cabinet="pixel"] .knob {
+  background: radial-gradient(circle at 35% 30%, #8a6ab8, #6f4a9e 60%, #4a2e6e);
+  border: 2px solid #3a2858;
+  box-shadow: 0 3px 0 rgba(40,25,70,0.8), inset 0 1px 2px rgba(255,255,255,0.35);
+}
+body[data-cabinet="pixel"] .knob-ind { background: #e8e0ff; }
+body[data-cabinet="pixel"] .knob-label { color: #5a5470; font-weight: bold; }
+body[data-cabinet="pixel"] .speaker {
+  background: repeating-linear-gradient(45deg, #8b8878 0 4px, #b5b2a8 4px 8px);
+  border: 2px solid #8b8878;
+  border-radius: 8px;
+}
+
+/* ── spaceage: 60s white shell + orange trim (Videosphere vibe) ── */
+body[data-cabinet="spaceage"] .tv {
+  border-radius: 30px;
+  background: linear-gradient(180deg, #f7f4ee, #e8e3d8 65%, #d8d2c4);
+  box-shadow: inset 0 3px 0 rgba(255,255,255,0.9),
+    inset 0 -4px 0 rgba(160,150,130,0.6), 0 8px 18px rgba(0,0,0,0.35);
+}
+body[data-cabinet="spaceage"] .cab-main {
+  background: #141414;
+  border: 4px solid #ff7a1a;
+  border-radius: 20px;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+}
+body[data-cabinet="spaceage"] .topbar,
+body[data-cabinet="spaceage"] .gear { color: #e8c9a8; }
+body[data-cabinet="spaceage"] .gear { border-color: #ff7a1a; background: #33221155; }
+body[data-cabinet="spaceage"] .gear:hover { background: #ff7a1a; color: #fff; }
+body[data-cabinet="spaceage"] .cab-panel {
+  background: linear-gradient(180deg, #f2eee4, #ddd6c6);
+  border: 3px solid #ff7a1a;
+  border-radius: 18px;
+}
+body[data-cabinet="spaceage"] .brand {
+  color: #ff7a1a; border: 2px solid #ff7a1a; border-radius: 10px;
+  font-weight: bold; text-shadow: none; background: #fff;
+}
+body[data-cabinet="spaceage"] .knob {
+  background: radial-gradient(circle at 35% 30%, #ffffff, #e8e3d8 55%, #c8c2b2);
+  border: 3px solid #ff7a1a;
+  box-shadow: 0 3px 0 rgba(160,120,60,0.5), inset 0 1px 2px rgba(255,255,255,0.9);
+}
+body[data-cabinet="spaceage"] .knob-ind { background: #ff7a1a; }
+body[data-cabinet="spaceage"] .knob-label { color: #c25e10; font-weight: bold; }
+body[data-cabinet="spaceage"] .speaker {
+  background: repeating-linear-gradient(0deg, #ff7a1a 0 3px, #f2eee4 3px 6px);
+  border: 3px solid #ff7a1a;
+  border-radius: 14px;
 }
 
 /* slim cabinet keeps the original look */

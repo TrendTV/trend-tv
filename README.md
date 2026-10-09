@@ -16,11 +16,12 @@ while you vibe code.
   channels: ALL / Production / Visual / Audio / DevTools / Games, with a
   static-burst channel-change animation. Categories are keyword-classified
   from each repo's language and description.
-- **TV appearances** — two body styles (Slim bezel, Woody 70s cabinet with
-  working CH/VOL knobs and speaker grille) × eight screen themes:
-  Green CRT, Amber, VHS Blue, B&W 1950s, Sakura ♥ (cute cartoon — swaps to
-  a rounded font with a heart cursor), Cyber Neon, Game Boy (4-shade
-  pea-green pixel look), and Telegram (cream e-ink with serif type).
+- **TV appearances** — six body styles: Slim bezel, Woody 70s (wood-grain
+  with knobs), Cartoon (chunky pastel plastic + bubble buttons), Cyberdeck
+  (gunmetal + neon trim), Pixel (handheld-gray + purple buttons), Space Age
+  (60s white shell + orange trim) — most with working CH/VOL knobs —
+  × seven screen themes: Green CRT, Amber, VHS Blue, B&W 1950s, Sakura
+  (cute cartoon — swaps to a rounded comic font), Cyber Neon, Game Boy.
 - **Hold time** — choose how long a finished card stays on screen before
   the next one: 2 / 5 / 10 / 15 / 20 seconds (default 5 s).
 - **CRT sound pack** — fully synthesized with WebAudio (no audio files):

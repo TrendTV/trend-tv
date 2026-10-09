@@ -26,18 +26,21 @@ const THEMES = [
   { id: 'amber',   label: 'Amber' },
   { id: 'vhs',     label: 'VHS Blue' },
   { id: 'bw',      label: 'B&W 1950s' },
-  { id: 'sakura',  label: 'Sakura ♥' },
+  { id: 'sakura',  label: 'Sakura' },
   { id: 'cyber',   label: 'Cyber Neon' },
   { id: 'gameboy', label: 'Game Boy' },
-  { id: 'paper',   label: 'Telegram' },
 ];
 
 // how long a finished card stays on screen (2–20 s), default 5 s
 const HOLDS = [2, 5, 10, 15, 20];
 
 const CABINETS = [
-  { id: 'slim',    label: 'Slim bezel' },
-  { id: 'woody70', label: 'Woody 70s' },
+  { id: 'slim',      label: 'Slim bezel' },
+  { id: 'woody70',   label: 'Woody 70s' },
+  { id: 'cartoon',   label: 'Cartoon' },
+  { id: 'cyberdeck', label: 'Cyberdeck' },
+  { id: 'pixel',     label: 'Pixel' },
+  { id: 'spaceage',  label: 'Space Age' },
 ];
 
 // volume presets — default LOW, barely audible, never scare the user
@@ -238,14 +241,20 @@ function updateChBadge() {
 function renderGuide() {
   const wrap = $('guide-channels');
   wrap.innerHTML = '';
+  const detail = $('ch-detail');
+  const showDetail = (ch) => {
+    const n = itemsForChannel(ch.id).length;
+    detail.textContent = `${ch.num} ${ch.label} — ${ch.desc} · ${n} repos`;
+  };
   CHANNELS.forEach(ch => {
     const div = document.createElement('div');
-    div.className = 'ch-item' + (ch.id === state.channel ? ' active' : '');
-    const n = itemsForChannel(ch.id).length;
-    div.textContent = `▸ ${ch.num}  ${ch.label}  —  ${ch.desc} (${n})`;
+    div.className = 'ch-btn' + (ch.id === state.channel ? ' active' : '');
+    div.textContent = `${ch.num} ${ch.label}`;
+    div.onmouseenter = () => showDetail(ch);
     div.onclick = () => { switchChannel(ch.id); toggleGuide(false); };
     wrap.appendChild(div);
   });
+  showDetail(CHANNELS.find(c => c.id === state.channel) || CHANNELS[0]);
   const tw = $('guide-themes');
   tw.innerHTML = '';
   THEMES.forEach(t => {
