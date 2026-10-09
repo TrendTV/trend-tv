@@ -1,6 +1,6 @@
 [package]
 name = "trend-tv"
-version = "0.6.0"
+version = "0.6.1"
 description = "CRT-TV trending GitHub companion"
 edition = "2021"
 build = "build.rs"

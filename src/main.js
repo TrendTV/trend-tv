@@ -34,6 +34,16 @@ const THEMES = [
 // how long a finished card stays on screen (2–20 s), default 5 s
 const HOLDS = [2, 5, 10, 15, 20];
 
+// screen font choices — 'auto' lets the theme pick (e.g. Sakura's comic)
+const FONTS = [
+  { id: 'auto',       label: 'Auto' },
+  { id: 'terminal',   label: 'Terminal' },
+  { id: 'console',    label: 'Console' },
+  { id: 'typewriter', label: 'Typewriter' },
+  { id: 'comic',      label: 'Comic' },
+  { id: 'wide',       label: 'Wide Mono' },
+];
+
 const CABINETS = [
   { id: 'slim',      label: 'Slim bezel' },
   { id: 'woody70',   label: 'Woody 70s' },
@@ -86,6 +96,7 @@ const state = {
   cabinet: localStorage.getItem('tc.cabinet') || 'woody70',
   holdMs: Math.min(20000, Math.max(2000,
     parseInt(localStorage.getItem('tc.hold') || '5000', 10) || 5000)),
+  font: localStorage.getItem('tc.font') || 'auto',
   chKnobAngle: 0,
   items: [],          // all items for current channel
   bag: [],            // shuffled queue (no repeats until exhausted)
@@ -294,11 +305,28 @@ function renderGuide() {
     div.onclick = () => setHold(s);
     hw.appendChild(div);
   });
+  const fw = $('guide-fonts');
+  fw.innerHTML = '';
+  FONTS.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'theme-chip' + (f.id === state.font ? ' active' : '');
+    div.textContent = f.label;
+    div.onclick = () => setFont(f.id);
+    fw.appendChild(div);
+  });
 }
 
 function setHold(s) {
   state.holdMs = s * 1000;
   localStorage.setItem('tc.hold', String(state.holdMs));
+  snd.knobClick();
+  renderGuide();
+}
+
+function setFont(id) {
+  state.font = id;
+  document.body.dataset.font = id;
+  localStorage.setItem('tc.font', id);
   snd.knobClick();
   renderGuide();
 }
@@ -380,6 +408,7 @@ async function boot() {
   if (!CHANNELS.some(c => c.id === state.channel)) state.channel = 'all';
   document.body.dataset.theme = state.theme;
   document.body.dataset.cabinet = state.cabinet;
+  document.body.dataset.font = state.font;
   $('gear').onclick = () => { snd.knobClick(); toggleGuide(); };
   $('guide-close').onclick = () => toggleGuide(false);
   $('screen').onclick = (e) => { if (!e.target.closest('.guide')) openCurrent(); };

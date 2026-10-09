@@ -170,19 +170,21 @@ html, body {
 .typed {
   position: absolute;
   inset: 0;
-  padding: 18px 18px 12px;
+  padding: 12px 16px 10px;
   color: var(--phosphor);
   font-family: var(--font, "Courier New", "Consolas", monospace);
   text-shadow: 0 0 6px var(--glow), 1px 0 0 rgba(255,0,80,0.15), -1px 0 0 rgba(0,180,255,0.15);
   font-size: 14px;
-  line-height: 1.7;
-  white-space: pre-wrap;
+  line-height: 1.45;
+  /* must NOT be pre-wrap: preserved whitespace between the divs renders
+     as phantom blank lines and creates huge vertical gaps */
+  white-space: normal;
   word-break: break-word;
   z-index: 2;
 }
 .label { color: var(--phosphor-dim); }
-.line.meta { margin-top: 8px; font-size: 12px; color: var(--phosphor-dim); }
-.line.desc { display: block; }
+.line.meta { margin-top: 5px; font-size: 12px; color: var(--phosphor-dim); }
+.line.desc { display: block; margin-top: 2px; }
 .cursor {
   display: inline-block;
   animation: blink 0.9s steps(1) infinite;
@@ -293,6 +295,7 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  overflow-y: auto;
 }
 .guide-title { color: var(--phosphor-dim); margin-bottom: 4px; letter-spacing: 1px; }
 .guide-section { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; max-height: 45%; }
@@ -589,3 +592,10 @@ body[data-cabinet="spaceage"] .speaker {
 
 /* slim cabinet keeps the original look */
 .cab-main { display: contents; }
+
+/* ── font picker (explicit choice overrides the theme's own font) ── */
+body[data-font="terminal"]   { --font: "Courier New", "Consolas", monospace; }
+body[data-font="console"]    { --font: Consolas, "Lucida Console", monospace; }
+body[data-font="typewriter"] { --font: Georgia, "Times New Roman", serif; }
+body[data-font="comic"]      { --font: "Comic Sans MS", "Chalkboard SE", "Segoe Print", cursive; }
+body[data-font="wide"]       { --font: "Lucida Console", "Courier New", monospace; }
