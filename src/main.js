@@ -14,6 +14,18 @@ const CHANNELS = [
   { id: 'audio',      num: 'CH-03', label: 'Audio',      desc: 'music & sound tools' },
   { id: 'devtools',   num: 'CH-04', label: 'DevTools',   desc: 'CLI & dev utilities' },
   { id: 'games',      num: 'CH-05', label: 'Games',      desc: 'engines & game code' },
+  { id: 'rust',       num: 'CH-06', label: 'Rust',       desc: 'rust trending' },
+  { id: 'python',     num: 'CH-07', label: 'Python',     desc: 'python trending' },
+  { id: 'typescript', num: 'CH-08', label: 'TypeScript', desc: 'TS trending' },
+  { id: 'javascript', num: 'CH-09', label: 'JavaScript', desc: 'JS trending' },
+  { id: 'go',         num: 'CH-10', label: 'Go',         desc: 'go trending' },
+  { id: 'cpp',        num: 'CH-11', label: 'C/C++',      desc: 'c & c++ trending' },
+  { id: 'jvm',        num: 'CH-12', label: 'JVM',        desc: 'java & kotlin' },
+  { id: 'swift',      num: 'CH-13', label: 'Swift',      desc: 'swift trending' },
+  { id: 'ruby',       num: 'CH-14', label: 'Ruby',       desc: 'ruby trending' },
+  { id: 'php',        num: 'CH-15', label: 'PHP',        desc: 'php trending' },
+  { id: 'dart',       num: 'CH-16', label: 'Dart',       desc: 'dart & flutter' },
+  { id: 'zig',        num: 'CH-17', label: 'Zig',        desc: 'zig trending' },
 ];
 
 const THEMES = [
@@ -341,6 +353,29 @@ async function boot() {
   refillBag();
   const item = nextItem();
   if (item) showItem(item);
+  if (q.get('guide')) toggleGuide(true);
+
+  // the backend crawls GitHub on every app open; pick up the fresh
+  // feed once it lands (~25s), then again periodically
+  if (inTauri) {
+    setTimeout(refreshFeedIfChanged, 25000);
+    setInterval(refreshFeedIfChanged, 10 * 60 * 1000);
+  }
+}
+
+async function refreshFeedIfChanged() {
+  try {
+    const payload = await invoke('get_feed');
+    if (!payload.items || !payload.items.length) return;
+    if (payload.items.length !== state.allItems.length) {
+      state.allItems = payload.items;
+      state.signalLost = !!payload.signal_lost;
+      $('standby').classList.toggle('hidden', !state.signalLost);
+      refillBag();
+      renderGuide();
+      console.log(`[feed] updated: ${payload.items.length} items`);
+    }
+  } catch (e) { /* keep showing current feed */ }
 }
 
 boot();

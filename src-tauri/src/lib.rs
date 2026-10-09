@@ -40,6 +40,7 @@ pub struct FeedPayload {
 pub struct AppState {
     cache: Mutex<Cache>,
     refreshing: AtomicBool,
+    session_refreshed: AtomicBool, // first get_feed of the session always fetches
 }
 
 fn now() -> u64 {
@@ -116,33 +117,75 @@ fn parse_trending(html_text: &str, out: &mut Vec<Item>, seen: &mut Vec<String>) 
     }
 }
 
-/// Fetch daily+weekly trending and merge. Any failure returns Err —
-/// caller keeps the old cache. This can never crash the app.
+/// Language-specific trending feeds → dedicated TV channels.
+/// (url slug, category id) — fetched every refresh, merged & deduped.
+const LANG_FEEDS: &[(&str, &str)] = &[
+    ("rust", "rust"),
+    ("python", "python"),
+    ("typescript", "typescript"),
+    ("javascript", "javascript"),
+    ("go", "go"),
+    ("c%2B%2B", "cpp"),
+    ("c", "cpp"),
+    ("java", "jvm"),
+    ("kotlin", "jvm"),
+    ("swift", "swift"),
+    ("ruby", "ruby"),
+    ("php", "php"),
+    ("dart", "dart"),
+    ("zig", "zig"),
+];
+
+/// Fetch overall daily+weekly plus every language channel, merge & dedupe.
+/// Any single-source failure is tolerated — caller keeps the old cache
+/// only if EVERYTHING fails. This can never crash the app.
 pub fn fetch_trending() -> Result<Vec<Item>, String> {
     let client = reqwest::blocking::Client::builder()
         .timeout(Duration::from_secs(15))
-        .user_agent("trend-tv/0.1")
+        .user_agent("trend-tv/0.3")
         .build()
         .map_err(|e| e.to_string())?;
 
     let mut items = Vec::new();
     let mut seen: Vec<String> = Vec::new();
     let mut any_ok = false;
-    for url in [
-        "https://github.com/trending?since=daily",
-        "https://github.com/trending?since=weekly",
-    ] {
-        match client.get(url).send() {
+
+    let mut pull = |url: String, forced_cat: Option<&str>, items: &mut Vec<Item>, seen: &mut Vec<String>| -> bool {
+        match client.get(&url).send() {
             Ok(resp) if resp.status().is_success() => {
-                if let Ok(body) = resp.text() {
-                    parse_trending(&body, &mut items, &mut seen);
-                    any_ok = true;
+                match resp.text() {
+                    Ok(body) => {
+                        let before = items.len();
+                        parse_trending(&body, items, seen);
+                        // language feeds override the keyword category
+                        if let Some(cat) = forced_cat {
+                            for it in items[before..].iter_mut() {
+                                it.category = cat.to_string();
+                            }
+                        }
+                        true
+                    }
+                    Err(_) => false,
                 }
             }
-            Ok(resp) => eprintln!("[fetch] {url} -> HTTP {}", resp.status()),
-            Err(e) => eprintln!("[fetch] {url} -> {e}"),
+            Ok(resp) => { eprintln!("[fetch] {url} -> HTTP {}", resp.status()); false }
+            Err(e) => { eprintln!("[fetch] {url} -> {e}"); false }
         }
+    };
+
+    for url in [
+        "https://github.com/trending?since=daily".to_string(),
+        "https://github.com/trending?since=weekly".to_string(),
+    ] {
+        if pull(url, None, &mut items, &mut seen) { any_ok = true; }
     }
+    for (slug, cat) in LANG_FEEDS {
+        let url = format!("https://github.com/trending/{slug}?since=daily");
+        if pull(url, Some(cat), &mut items, &mut seen) { any_ok = true; }
+        // be polite to github.com — small gap between channel fetches
+        std::thread::sleep(Duration::from_millis(300));
+    }
+
     if any_ok && !items.is_empty() { Ok(items) } else { Err("all sources failed".into()) }
 }
 
@@ -186,11 +229,13 @@ fn build_payload(cache: &Cache) -> FeedPayload {
 
 #[tauri::command]
 fn get_feed(state: tauri::State<'_, Arc<AppState>>) -> FeedPayload {
+    // fresh crawl on every app open (first call of the session)
+    let first_call = !state.session_refreshed.swap(true, Ordering::SeqCst);
     let stale = {
         let cache = state.cache.lock().unwrap();
         now().saturating_sub(cache.last_attempt) > FETCH_TTL_SECS
     };
-    if stale {
+    if first_call || stale {
         spawn_refresh(state.inner());
     }
     let cache = state.cache.lock().unwrap();
@@ -209,6 +254,7 @@ pub fn run() {
         .manage(Arc::new(AppState {
             cache: Mutex::new(load_cache()),
             refreshing: AtomicBool::new(false),
+            session_refreshed: AtomicBool::new(false),
         }))
         .invoke_handler(tauri::generate_handler![get_feed, refresh_now])
         .run(tauri::generate_context!())

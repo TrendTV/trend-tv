@@ -219,7 +219,7 @@ html, body {
   gap: 6px;
 }
 .guide-title { color: var(--phosphor-dim); margin-bottom: 4px; letter-spacing: 1px; }
-.guide-section { display: flex; flex-direction: column; gap: 2px; }
+.guide-section { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; max-height: 45%; }
 .ch-item {
   padding: 2px 6px;
   cursor: pointer;
@@ -227,6 +227,8 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.6;
+  flex-shrink: 0;
 }
 .ch-item:hover, .ch-item.active { background: var(--phosphor); color: #04140a; text-shadow: none; }
 .guide-sub { color: var(--phosphor-dim); margin-top: 8px; letter-spacing: 2px; font-size: 11px; }
