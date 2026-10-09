@@ -1,7 +1,7 @@
 {
   "name": "trend-tv",
   "private": true,
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "A tiny CRT-TV desktop companion that types out trending GitHub repos",
   "type": "module",
   "scripts": {

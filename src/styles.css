@@ -132,12 +132,15 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2px 8px;
+  padding: 6px 8px 4px; /* taller grip area for dragging */
   font-size: 11px;
   color: var(--phosphor-dim);
-  -webkit-app-region: drag;
+  cursor: move;
 }
-.ch-badge { letter-spacing: 1px; }
+.ch-badge { letter-spacing: 1px; cursor: move; }
+.hint { cursor: move; }
+.cab-panel, .cab-panel .brand, .cab-panel .speaker { cursor: move; }
+.cab-panel .knob { cursor: pointer; }
 .gear {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--phosphor-dim);

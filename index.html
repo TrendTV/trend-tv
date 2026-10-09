@@ -7,11 +7,11 @@
   <link rel="stylesheet" href="./src/styles.css" />
 </head>
 <body data-theme="green" data-cabinet="woody70">
-  <div id="tv" class="tv">
+  <div id="tv" class="tv" data-tauri-drag-region>
     <div class="cab-main">
       <!-- top bar: drag region + gear -->
       <div id="topbar" class="topbar" data-tauri-drag-region>
-        <span id="ch-badge" class="ch-badge">CH-00 · ALL</span>
+        <span id="ch-badge" class="ch-badge" data-tauri-drag-region>CH-00 · ALL</span>
         <button id="gear" class="gear" title="TV Guide" aria-label="TV Guide">⚙ GUIDE</button>
       </div>
 
@@ -40,12 +40,12 @@
         <div class="vignette"></div>
       </div>
 
-      <div class="hint">click card to open on GitHub · ⚙ GUIDE for channels</div>
+      <div class="hint" data-tauri-drag-region>click card to open on GitHub · ⚙ GUIDE for channels</div>
     </div>
 
     <!-- 70s woody cabinet control panel (hidden in slim mode) -->
-    <div id="cab-panel" class="cab-panel">
-      <div class="brand">TREND&nbsp;TV</div>
+    <div id="cab-panel" class="cab-panel" data-tauri-drag-region>
+      <div class="brand" data-tauri-drag-region>TREND&nbsp;TV</div>
       <div class="knob-row">
         <div class="knob-wrap">
           <div id="knob-ch" class="knob" title="Channel"><div class="knob-ind"></div></div>
@@ -56,7 +56,7 @@
           <span class="knob-label">VOL</span>
         </div>
       </div>
-      <div class="speaker"></div>
+      <div class="speaker" data-tauri-drag-region></div>
     </div>
 
     <!-- TV guide overlay -->
