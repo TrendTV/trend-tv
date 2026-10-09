@@ -17,8 +17,12 @@ while you vibe code.
   static-burst channel-change animation. Categories are keyword-classified
   from each repo's language and description.
 - **TV appearances** — two body styles (Slim bezel, Woody 70s cabinet with
-  working CH/VOL knobs and speaker grille) × four phosphor themes
-  (Green CRT, Amber, VHS Blue, B&W 1950s).
+  working CH/VOL knobs and speaker grille) × eight screen themes:
+  Green CRT, Amber, VHS Blue, B&W 1950s, Sakura ♥ (cute cartoon — swaps to
+  a rounded font with a heart cursor), Cyber Neon, Game Boy (4-shade
+  pea-green pixel look), and Telegram (cream e-ink with serif type).
+- **Hold time** — choose how long a finished card stays on screen before
+  the next one: 2 / 5 / 10 / 15 / 20 seconds (default 5 s).
 - **CRT sound pack** — fully synthesized with WebAudio (no audio files):
   power-on hum + tube crackle, per-character typing clacks, static bursts
   on channel switches, degauss wobble on hover, mechanical knob clicks.

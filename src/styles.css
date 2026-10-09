@@ -30,6 +30,63 @@ body[data-theme="bw"] {
   --screen-bg: radial-gradient(ellipse at center, #1f1f1f 0%, #0a0a0a 75%);
 }
 
+/* ── cute cartoon: rounded font, hearts, bubblegum pink ── */
+body[data-theme="sakura"] {
+  --phosphor: #ff8fb8;
+  --phosphor-dim: #e06a97;
+  --glow: rgba(255, 143, 184, 0.5);
+  --screen-bg: radial-gradient(ellipse at center, #2b1020 0%, #12060d 75%);
+  --font: "Comic Sans MS", "Chalkboard SE", "Segoe Print", cursive;
+}
+body[data-theme="sakura"] .cursor { font-size: 0; }
+body[data-theme="sakura"] .cursor::after { content: "♥"; font-size: 15px; }
+body[data-theme="sakura"] .screen { border-radius: 18px; }
+body[data-theme="sakura"] .typed { text-shadow: 0 0 8px var(--glow), 2px 2px 0 rgba(120, 20, 60, 0.6); }
+
+/* ── cyber neon: cyan/magenta double glow ── */
+body[data-theme="cyber"] {
+  --phosphor: #00fff0;
+  --phosphor-dim: #9d4edd;
+  --glow: rgba(0, 255, 240, 0.45);
+  --screen-bg: radial-gradient(ellipse at center, #120a2e 0%, #05030f 75%);
+}
+body[data-theme="cyber"] .typed {
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px var(--glow), 2px 0 0 rgba(255, 0, 200, 0.5), -2px 0 0 rgba(0, 100, 255, 0.5);
+}
+
+/* ── game boy: 4-shade pea-green, chunky pixels ── */
+body[data-theme="gameboy"] {
+  --phosphor: #9bbc0f;
+  --phosphor-dim: #306230;
+  --glow: rgba(155, 188, 15, 0.25);
+  --screen-bg: radial-gradient(ellipse at center, #0f380f 0%, #081f08 75%);
+  --font: "Courier New", monospace;
+}
+body[data-theme="gameboy"] .typed {
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 0 #306230;
+}
+body[data-theme="gameboy"] .scanlines {
+  background: repeating-linear-gradient(
+    to bottom, transparent 0px, transparent 3px, rgba(8, 31, 8, 0.45) 4px, rgba(8, 31, 8, 0.45) 5px);
+}
+
+/* ── paper telegram: cream e-ink, serif typewriter, no scanlines ── */
+body[data-theme="paper"] {
+  --phosphor: #33302a;
+  --phosphor-dim: #7a6f5d;
+  --glow: rgba(80, 70, 50, 0.25);
+  --screen-bg: radial-gradient(ellipse at center, #f2e8d5 0%, #ddd0b8 75%);
+  --font: Georgia, "Times New Roman", serif;
+}
+body[data-theme="paper"] .typed { text-shadow: none; }
+body[data-theme="paper"] .scanlines { display: none; }
+body[data-theme="paper"] .vignette { box-shadow: inset 0 0 42px 15px rgba(120, 100, 70, 0.35); animation: none; }
+body[data-theme="paper"] .theme-chip:hover, body[data-theme="paper"] .ch-item:hover,
+body[data-theme="paper"] .theme-chip.active, body[data-theme="paper"] .ch-item.active { color: #f2e8d5; }
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
@@ -97,6 +154,7 @@ html, body {
   inset: 0;
   padding: 18px 18px 12px;
   color: var(--phosphor);
+  font-family: var(--font, "Courier New", "Consolas", monospace);
   text-shadow: 0 0 6px var(--glow), 1px 0 0 rgba(255,0,80,0.15), -1px 0 0 rgba(0,180,255,0.15);
   font-size: 14px;
   line-height: 1.7;

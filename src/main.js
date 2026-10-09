@@ -22,11 +22,18 @@ const CHANNELS = [
 ];
 
 const THEMES = [
-  { id: 'green', label: 'Green CRT' },
-  { id: 'amber', label: 'Amber' },
-  { id: 'vhs',   label: 'VHS Blue' },
-  { id: 'bw',    label: 'B&W 1950s' },
+  { id: 'green',   label: 'Green CRT' },
+  { id: 'amber',   label: 'Amber' },
+  { id: 'vhs',     label: 'VHS Blue' },
+  { id: 'bw',      label: 'B&W 1950s' },
+  { id: 'sakura',  label: 'Sakura ♥' },
+  { id: 'cyber',   label: 'Cyber Neon' },
+  { id: 'gameboy', label: 'Game Boy' },
+  { id: 'paper',   label: 'Telegram' },
 ];
+
+// how long a finished card stays on screen (2–20 s), default 5 s
+const HOLDS = [2, 5, 10, 15, 20];
 
 const CABINETS = [
   { id: 'slim',    label: 'Slim bezel' },
@@ -74,6 +81,8 @@ const state = {
   channel: localStorage.getItem('tc.channel') || 'all',
   theme: localStorage.getItem('tc.theme') || 'green',
   cabinet: localStorage.getItem('tc.cabinet') || 'woody70',
+  holdMs: Math.min(20000, Math.max(2000,
+    parseInt(localStorage.getItem('tc.hold') || '5000', 10) || 5000)),
   chKnobAngle: 0,
   items: [],          // all items for current channel
   bag: [],            // shuffled queue (no repeats until exhausted)
@@ -176,8 +185,8 @@ function showItem(item) {
     typeInto($('f-cat'), `${item.category.toUpperCase()} · ${item.lang || 'unknown'}`, speed, () => {
       typeInto($('f-desc'), item.desc || '(no description)', speed * 0.55, () => {
         $('f-meta').textContent = `★ ${item.stars || '?'}   ${item.today || ''}`;
-        // typing finished → hold static 5s for the user to read
-        later(glitchOutAndNext, 5000);
+        // typing finished → hold for the configured time so the user can read
+        later(glitchOutAndNext, state.holdMs);
       });
     });
   });
@@ -267,6 +276,22 @@ function renderGuide() {
     div.onclick = () => { setVolumeStep(v.v); };
     vw.appendChild(div);
   });
+  const hw = $('guide-hold');
+  hw.innerHTML = '';
+  HOLDS.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'theme-chip' + (state.holdMs === s * 1000 ? ' active' : '');
+    div.textContent = `${s}s`;
+    div.onclick = () => setHold(s);
+    hw.appendChild(div);
+  });
+}
+
+function setHold(s) {
+  state.holdMs = s * 1000;
+  localStorage.setItem('tc.hold', String(state.holdMs));
+  snd.knobClick();
+  renderGuide();
 }
 
 function setCabinet(id) {
