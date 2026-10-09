@@ -70,25 +70,50 @@ fn save_cache(c: &Cache) {
     }
 }
 
-/// Same keyword rules as the frontend fallback.
+/// Keyword classification into plain-English TV channels.
+/// Checked in priority order — specific lifestyles before generic tech.
+/// Mirror of the frontend categorize(); keep both in sync.
 fn categorize(lang: &str, desc: &str) -> String {
     let t = format!("{} {}", lang, desc).to_lowercase();
     let has = |ws: &[&str]| ws.iter().any(|w| t.contains(w));
-    if has(&["audio", "music", "sound", "synth", "midi", "dsp", "spotify"]) {
-        return "audio".into();
+    if has(&["game", "godot", "unity", "unreal", "bevy", "chess", "puzzle",
+             "emulator", "pokemon", "minecraft", "meme", "fun", "play"]) {
+        return "fun".into();
     }
-    if has(&["game", "godot", "unity", "unreal", "engine", "bevy"]) {
-        return "games".into();
+    if has(&["robot", "3d print", "3d-print", "arduino", "raspberry", "embedded",
+             "firmware", "cad", "cnc", "iot", "sensor", "drone", "motor",
+             "fpga", "mechanical", "hardware"]) {
+        return "mechanical".into();
+    }
+    if has(&["audio", "music", "sound", "synth", "midi", "spotify", "podcast", "dj "]) {
+        return "music".into();
+    }
+    if has(&["health", "fitness", "medical", "workout", "sleep", "diet", "mental"]) {
+        return "healthy".into();
+    }
+    if has(&["finance", "trading", "stock", "crypto", "bitcoin", "invoice",
+             "money", "market", "budget", "expense"]) {
+        return "money".into();
+    }
+    if has(&["learn", "education", "course", "tutorial", "book", "study",
+             "awesome", "interview", "cheatsheet", "curriculum", "guide"]) {
+        return "learn".into();
+    }
+    if has(&["productivity", "note", "todo", "task", "calendar", "habit",
+             "journal", "recipe", "cooking", "home", "shopping", "travel",
+             "weather", "personal", "self-host", "selfhost"]) {
+        return "daily".into();
     }
     if has(&["css", "ui", "design", "frontend", "tailwind", "react", "vue", "svelte",
-             "component", "animation", "three.js", "webgl", "shader", "canvas", "figma"]) {
-        return "visual".into();
+             "component", "animation", "three.js", "webgl", "shader", "canvas",
+             "figma", "art", "draw", "photo", "video", "icon", "font", "theme"]) {
+        return "creative".into();
     }
-    if has(&["cli", "terminal", "shell", "linter", "formatter", "git ", "devtools",
-             "debug", "build tool", "bundler", "compiler"]) {
-        return "devtools".into();
+    if has(&["ai", "llm", "gpt", "machine learning", "neural", "model", "agent",
+             "diffusion", "transformer", "ocr", "vision", "speech", "chatbot", "rag"]) {
+        return "ai".into();
     }
-    "production".into()
+    "workshop".into() // tools & building stuff
 }
 
 fn parse_trending(html_text: &str, out: &mut Vec<Item>, seen: &mut Vec<String>) {
@@ -117,32 +142,21 @@ fn parse_trending(html_text: &str, out: &mut Vec<Item>, seen: &mut Vec<String>) 
     }
 }
 
-/// Language-specific trending feeds → dedicated TV channels.
-/// (url slug, category id) — fetched every refresh, merged & deduped.
-const LANG_FEEDS: &[(&str, &str)] = &[
-    ("rust", "rust"),
-    ("python", "python"),
-    ("typescript", "typescript"),
-    ("javascript", "javascript"),
-    ("go", "go"),
-    ("c%2B%2B", "cpp"),
-    ("c", "cpp"),
-    ("java", "jvm"),
-    ("kotlin", "jvm"),
-    ("swift", "swift"),
-    ("ruby", "ruby"),
-    ("php", "php"),
-    ("dart", "dart"),
-    ("zig", "zig"),
+/// Extra trending pages used purely as raw pool sources — the more we
+/// pull, the closer each plain-English channel gets to its "top 50".
+/// Categories are assigned by keyword (see categorize), never by language.
+const POOL_FEEDS: &[&str] = &[
+    "rust", "python", "typescript", "javascript", "go", "c%2B%2B", "c",
+    "java", "kotlin", "swift", "ruby", "php", "dart", "zig",
 ];
 
-/// Fetch overall daily+weekly plus every language channel, merge & dedupe.
-/// Any single-source failure is tolerated — caller keeps the old cache
-/// only if EVERYTHING fails. This can never crash the app.
+/// Fetch overall trending (daily/weekly/monthly) plus extra pool pages,
+/// merge & dedupe. Any single-source failure is tolerated — caller keeps
+/// the old cache only if EVERYTHING fails. Never crashes the app.
 pub fn fetch_trending() -> Result<Vec<Item>, String> {
     let client = reqwest::blocking::Client::builder()
         .timeout(Duration::from_secs(15))
-        .user_agent("trend-tv/0.3")
+        .user_agent("trend-tv/0.4")
         .build()
         .map_err(|e| e.to_string())?;
 
@@ -150,21 +164,11 @@ pub fn fetch_trending() -> Result<Vec<Item>, String> {
     let mut seen: Vec<String> = Vec::new();
     let mut any_ok = false;
 
-    let mut pull = |url: String, forced_cat: Option<&str>, items: &mut Vec<Item>, seen: &mut Vec<String>| -> bool {
+    let mut pull = |url: String, items: &mut Vec<Item>, seen: &mut Vec<String>| -> bool {
         match client.get(&url).send() {
             Ok(resp) if resp.status().is_success() => {
                 match resp.text() {
-                    Ok(body) => {
-                        let before = items.len();
-                        parse_trending(&body, items, seen);
-                        // language feeds override the keyword category
-                        if let Some(cat) = forced_cat {
-                            for it in items[before..].iter_mut() {
-                                it.category = cat.to_string();
-                            }
-                        }
-                        true
-                    }
+                    Ok(body) => { parse_trending(&body, items, seen); true }
                     Err(_) => false,
                 }
             }
@@ -176,13 +180,14 @@ pub fn fetch_trending() -> Result<Vec<Item>, String> {
     for url in [
         "https://github.com/trending?since=daily".to_string(),
         "https://github.com/trending?since=weekly".to_string(),
+        "https://github.com/trending?since=monthly".to_string(),
     ] {
-        if pull(url, None, &mut items, &mut seen) { any_ok = true; }
+        if pull(url, &mut items, &mut seen) { any_ok = true; }
     }
-    for (slug, cat) in LANG_FEEDS {
+    for slug in POOL_FEEDS {
         let url = format!("https://github.com/trending/{slug}?since=daily");
-        if pull(url, Some(cat), &mut items, &mut seen) { any_ok = true; }
-        // be polite to github.com — small gap between channel fetches
+        if pull(url, &mut items, &mut seen) { any_ok = true; }
+        // be polite to github.com — small gap between fetches
         std::thread::sleep(Duration::from_millis(300));
     }
 

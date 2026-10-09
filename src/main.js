@@ -8,24 +8,17 @@ import { openUrl } from '@tauri-apps/plugin-opener';
 import * as snd from './sounds.js';
 
 const CHANNELS = [
-  { id: 'all',        num: 'CH-00', label: 'ALL',        desc: 'everything trending' },
-  { id: 'production', num: 'CH-01', label: 'Production', desc: 'frameworks, infra, AI' },
-  { id: 'visual',     num: 'CH-02', label: 'Visual',     desc: 'UI, design, frontend' },
-  { id: 'audio',      num: 'CH-03', label: 'Audio',      desc: 'music & sound tools' },
-  { id: 'devtools',   num: 'CH-04', label: 'DevTools',   desc: 'CLI & dev utilities' },
-  { id: 'games',      num: 'CH-05', label: 'Games',      desc: 'engines & game code' },
-  { id: 'rust',       num: 'CH-06', label: 'Rust',       desc: 'rust trending' },
-  { id: 'python',     num: 'CH-07', label: 'Python',     desc: 'python trending' },
-  { id: 'typescript', num: 'CH-08', label: 'TypeScript', desc: 'TS trending' },
-  { id: 'javascript', num: 'CH-09', label: 'JavaScript', desc: 'JS trending' },
-  { id: 'go',         num: 'CH-10', label: 'Go',         desc: 'go trending' },
-  { id: 'cpp',        num: 'CH-11', label: 'C/C++',      desc: 'c & c++ trending' },
-  { id: 'jvm',        num: 'CH-12', label: 'JVM',        desc: 'java & kotlin' },
-  { id: 'swift',      num: 'CH-13', label: 'Swift',      desc: 'swift trending' },
-  { id: 'ruby',       num: 'CH-14', label: 'Ruby',       desc: 'ruby trending' },
-  { id: 'php',        num: 'CH-15', label: 'PHP',        desc: 'php trending' },
-  { id: 'dart',       num: 'CH-16', label: 'Dart',       desc: 'dart & flutter' },
-  { id: 'zig',        num: 'CH-17', label: 'Zig',        desc: 'zig trending' },
+  { id: 'all',        num: 'CH-00', label: 'ALL',           desc: 'everything trending' },
+  { id: 'daily',      num: 'CH-01', label: 'Daily Life',    desc: 'notes, habits, home & everyday tools' },
+  { id: 'fun',        num: 'CH-02', label: 'For Fun',       desc: 'games & silly toys' },
+  { id: 'mechanical', num: 'CH-03', label: 'Mechanical',    desc: 'robots, 3D printing & hardware' },
+  { id: 'creative',   num: 'CH-04', label: 'Creative',      desc: 'design, art, video & pretty things' },
+  { id: 'music',      num: 'CH-05', label: 'Sound & Music', desc: 'tunes & audio toys' },
+  { id: 'money',      num: 'CH-06', label: 'Money',         desc: 'finance, trading & budgeting' },
+  { id: 'healthy',    num: 'CH-07', label: 'Healthy',       desc: 'fitness, sleep & wellbeing' },
+  { id: 'learn',      num: 'CH-08', label: 'Learn',         desc: 'courses, books & guides' },
+  { id: 'ai',         num: 'CH-09', label: 'AI',            desc: 'smart models & agents' },
+  { id: 'workshop',   num: 'CH-10', label: 'Workshop',      desc: 'tools for building stuff' },
 ];
 
 const THEMES = [
@@ -48,18 +41,32 @@ const VOLUMES = [
   { id: 'high', v: 0.7,  label: 'High' },
 ];
 
-/* keyword categorization — mirrors the Rust backend, used for
-   browser-preview mode where we only have the raw snapshot */
+/* keyword categorization into plain-English channels — mirrors the
+   Rust backend, used for browser-preview mode (raw snapshot data).
+   Checked in priority order; keep both in sync. */
 function categorize(lang, desc) {
   const t = `${lang} ${desc}`.toLowerCase();
   const has = (...ws) => ws.some(w => t.includes(w));
-  if (has('audio', 'music', 'sound', 'synth', 'midi', 'dsp', 'spotify')) return 'audio';
-  if (has('game', 'godot', 'unity', 'unreal', 'engine', 'bevy')) return 'games';
+  if (has('game', 'godot', 'unity', 'unreal', 'bevy', 'chess', 'puzzle',
+          'emulator', 'pokemon', 'minecraft', 'meme', 'fun', 'play')) return 'fun';
+  if (has('robot', '3d print', '3d-print', 'arduino', 'raspberry', 'embedded',
+          'firmware', 'cad', 'cnc', 'iot', 'sensor', 'drone', 'motor',
+          'fpga', 'mechanical', 'hardware')) return 'mechanical';
+  if (has('audio', 'music', 'sound', 'synth', 'midi', 'spotify', 'podcast', 'dj ')) return 'music';
+  if (has('health', 'fitness', 'medical', 'workout', 'sleep', 'diet', 'mental')) return 'healthy';
+  if (has('finance', 'trading', 'stock', 'crypto', 'bitcoin', 'invoice',
+          'money', 'market', 'budget', 'expense')) return 'money';
+  if (has('learn', 'education', 'course', 'tutorial', 'book', 'study',
+          'awesome', 'interview', 'cheatsheet', 'curriculum', 'guide')) return 'learn';
+  if (has('productivity', 'note', 'todo', 'task', 'calendar', 'habit',
+          'journal', 'recipe', 'cooking', 'home', 'shopping', 'travel',
+          'weather', 'personal', 'self-host', 'selfhost')) return 'daily';
   if (has('css', 'ui', 'design', 'frontend', 'tailwind', 'react', 'vue', 'svelte',
-          'component', 'animation', 'three.js', 'webgl', 'shader', 'canvas', 'figma')) return 'visual';
-  if (has('cli', 'terminal', 'shell', 'linter', 'formatter', 'git ', 'devtools',
-          'debug', 'build tool', 'bundler', 'compiler')) return 'devtools';
-  return 'production';
+          'component', 'animation', 'three.js', 'webgl', 'shader', 'canvas',
+          'figma', 'art', 'draw', 'photo', 'video', 'icon', 'font', 'theme')) return 'creative';
+  if (has('ai', 'llm', 'gpt', 'machine learning', 'neural', 'model', 'agent',
+          'diffusion', 'transformer', 'ocr', 'vision', 'speech', 'chatbot', 'rag')) return 'ai';
+  return 'workshop';
 }
 
 /* ── state ── */
@@ -335,6 +342,8 @@ async function boot() {
   const q = new URLSearchParams(location.search);
   if (q.get('cabinet')) state.cabinet = q.get('cabinet');
   if (q.get('theme')) state.theme = q.get('theme');
+  // saved channel may no longer exist after channel renames
+  if (!CHANNELS.some(c => c.id === state.channel)) state.channel = 'all';
   document.body.dataset.theme = state.theme;
   document.body.dataset.cabinet = state.cabinet;
   $('gear').onclick = () => { snd.knobClick(); toggleGuide(); };
